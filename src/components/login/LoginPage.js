@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AiOutlineTwitter,
   AiFillEye,
   AiFillEyeInvisible,
 } from "react-icons/ai";
-const LogInPage = ({ page, setPage, darkMode }) => {
+
+const LogInPage = ({ page, setPage, darkMode, users, setUsers }) => {
   const [loginInput, setLoginInput] = useState({ username: "", password: "" });
   const [activeBtn, setActiveBtn] = useState(false);
   const [error, setError] = useState({ username: false, password: false });
   const [isVisible, setIsVisible] = useState(false);
+  const [alert, setAlert] = useState(false);
 
   //handling input change
 
@@ -27,7 +29,15 @@ const LogInPage = ({ page, setPage, darkMode }) => {
     e.preventDefault();
     if (loginInput.username !== "" && loginInput.password !== "") {
       setError({ username: false, password: false });
-      setPage("homepage");
+      const isUserExist = users.findIndex(
+        ({ username, password }) =>
+          username === loginInput.username && password === loginInput.password
+      );
+      if (isUserExist !== -1) {
+        setPage("homepage");
+      } else {
+        setAlert(true);
+      }
     } else {
       if (loginInput.username === "" && loginInput.password === "") {
         setError({ username: true, password: true });
@@ -39,6 +49,13 @@ const LogInPage = ({ page, setPage, darkMode }) => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setAlert(false);
+    }, 2000);
+    return clearTimeout;
+  }, [alert]);
+
   return (
     <section className={`login-page ${darkMode && "dark-mode-login-signup"}`}>
       <div className="side-bar">
@@ -48,6 +65,9 @@ const LogInPage = ({ page, setPage, darkMode }) => {
       <div className="container">
         <h1>Login</h1>
         <form onSubmit={(e) => handleSubmit(e)} autoComplete="off">
+          <p className={`alert ${alert && "show"}`}>
+            Invalid Username or Password
+          </p>
           <div className="input-container">
             <input
               className={`input ${error.username && "error"}`}

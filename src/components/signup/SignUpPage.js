@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AiOutlineTwitter,
   AiFillEye,
   AiFillEyeInvisible,
 } from "react-icons/ai";
 
-const SignUpPage = ({ page, setPage, darkMode }) => {
+const SignUpPage = ({ page, setPage, darkMode, setUsers, users }) => {
   const [signUpInput, setSignUpInput] = useState({
     username: "",
     email: "",
@@ -13,6 +13,11 @@ const SignUpPage = ({ page, setPage, darkMode }) => {
   });
   const [activeBtn, setActiveBtn] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [error, setError] = useState({
+    username: false,
+    password: false,
+    email: false,
+  });
 
   //handle input change
   const handleChange = (e) => {
@@ -32,8 +37,37 @@ const SignUpPage = ({ page, setPage, darkMode }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setPage("homepage");
+    if (
+      signUpInput.username !== "" &&
+      signUpInput.password !== "" &&
+      signUpInput.email !== ""
+    ) {
+      setError({ username: false, password: false, email: false });
+      const newUser = {
+        username: signUpInput.username,
+        password: signUpInput.password,
+      };
+
+      const newUsers = [newUser, ...users];
+      setUsers(newUsers);
+      setPage("homepage");
+    } else {
+      if (
+        signUpInput.username === "" &&
+        signUpInput.password === "" &&
+        signUpInput.email === ""
+      ) {
+        setError({ username: true, password: true, email: true });
+      } else if (signUpInput.username === "") {
+        setError({ username: true, password: false, email: false });
+      } else if (signUpInput.password === "") {
+        setError({ username: false, password: true, email: false });
+      } else if (signUpInput.email === "") {
+        setError({ username: false, password: false, email: true });
+      }
+    }
   };
+
   return (
     <section className={`login-page ${darkMode && "dark-mode-login-signup"}`}>
       <div className="side-bar">
@@ -45,7 +79,7 @@ const SignUpPage = ({ page, setPage, darkMode }) => {
         <form onSubmit={(e) => handleSubmit(e)}>
           <div className="input-container">
             <input
-              className="input"
+              className={`input ${error.username && "error"}`}
               name="username"
               type="text"
               placeholder="UserName"
@@ -56,7 +90,7 @@ const SignUpPage = ({ page, setPage, darkMode }) => {
           </div>
           <div className="input-container">
             <input
-              className="input"
+              className={`input ${error.email && "error"}`}
               name="email"
               type="email"
               placeholder="Email"
@@ -66,7 +100,7 @@ const SignUpPage = ({ page, setPage, darkMode }) => {
           </div>
           <div className="input-container">
             <input
-              className="input"
+              className={`input ${error.password && "error"}`}
               name="password"
               type={isVisible ? "text" : "password"}
               placeholder="Password"
