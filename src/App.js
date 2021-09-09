@@ -1,25 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import LoginPage from "./components/login/LoginPage";
+import SignUpPage from "./components/signup/SignUpPage";
+import HomePageLight from "./components/home/HomePage";
 
+const getLocalStorage = () => {
+  const value = localStorage.getItem("darkMode");
+  if (value === null) {
+    return false;
+  } else {
+    return JSON.parse(value);
+  }
+};
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [page, setPage] = useState("login");
+  const [darkMode, setDarkMode] = useState(getLocalStorage);
+
+  if (page === "signup") {
+    return <SignUpPage page={page} setPage={setPage} darkMode={darkMode} />;
+  }
+
+  if (page === "homepage") {
+    return (
+      <HomePageLight
+        page={page}
+        setPage={setPage}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+      />
+    );
+  }
+
+  return <LoginPage page={page} setPage={setPage} darkMode={darkMode} />;
 }
 
 export default App;
